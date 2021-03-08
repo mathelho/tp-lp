@@ -6,7 +6,7 @@
 
 %term VAR
     | FUN | REC | DP
-    | IF | THEN | ELSE | MATCH | WITH | EXCL | TRACO | HEAD | TAIL | ISEMPTY | PRINT
+    | IF | THEN | ELSE | MATCH | WITH | EXCL | NEGATIVO | HEAD | TAIL | ISEMPTY | PRINT
     | AND | PLUS | MINUS | MULTI | DIV | EQ | DIF | LESS | LEQ | DDP | SEMIC
     | LBRACKET | RBRACKET | LCHAVE | RCHAVE | LPAR | RPAR
     | FN | END | SETAANON | VIRGULA | PIPE | SETA | UNDERLINE
@@ -14,10 +14,10 @@
     | NAME of string | INTEGER of int | BOOLEAN of bool
     | EOF
 
-%nonterm Prog of expr | Prog of decl | Decl of expr | Expr of expr | AtomExpr of expr       (?)
-| AppExpr of expr | Const of expr | Comps of expr | MatchExpr of expr | CondExpr of expr
-| Args of expr | Params of plcType | TypedVar of plcType | Type of plcType 
-| AtomType of plcType | Types of plcType
+%nonterm Prog of expr | Decl of expr | Expr of expr | AtomExpr of expr       (?)
+| AppExpr of expr | Const of expr | Comps of expr list | MatchExpr of expr | CondExpr of expr
+| Args of (plcType * string) list | Params of (plcType * string) list | TypedVar of string * plcType
+| Type of plcType | AtomType of plcType | Types of plcType list
 
 %right SEMIC SETA DDP
 %left ELSE AND EQ DIF LESS LEQ PLUS MINUS MULTI DIV LBRACKET
@@ -34,15 +34,15 @@ Prog : Expr (Expr)
   |  Decl SEMIC Prog (Prog)
 
 Decl : VAR NAME EQ Expr (Let(NAME, Expr, Prog))
-  |  FUN NAME Args EQ Expr (Let(NAME, Anon(ListT, Expr), Expr))
-  |  FUN REC NAME Args DP Type EQ Expr (Letrec(NAME, Type, NAME2, Type, Expr, Expr))    (?)
+  |  FUN NAME Args EQ Expr (Let(NAME, makeAnon(Args, Expr), Prog))
+  |  FUN REC NAME Args DP Type EQ Expr (makeFun(NAME, Args, Type, Expr, Prog))    (o último argumento é prog mesmo?)
 
 Expr : AtomExpr (AtomExpr)
-  |  AppExpr (Call(AppExpr, AppExpr))       (dois AppExpr? oq fazer)
+  |  AppExpr (AppExpr)
   |  IF Expr THEN Expr ELSE Expr (If(Expr1, Expr2, Expr3))
   |  MATCH Expr WITH MatchExpr Match(Expr, List)
   |  EXCL Expr (Prim1("!", Expr))
-  |  TRACO Expr (Prim1("-", Expr))
+  |  NEGATIVO Expr (Prim1("-", Expr))
   |  HEAD Expr (Prim1("hd", Expr))
   |  TAIL Expr (Prim1("tl", Expr))
   |  ISEMPTY Expr (Prim1("ise", Expr))
@@ -58,22 +58,22 @@ Expr : AtomExpr (AtomExpr)
   |  Expr LEQ Expr (Prim2("<=", Expr1, Expr2))
   |  Expr DDP Expr (Prim2("::", Expr1, Expr2))
   |  Expr SEMIC Expr (Prim2(";", Expr1, Expr2))
-  |  Expr LBRACKET INTEGER RBRACKET (Item(INTEGER))
+  |  Expr LBRACKET INTEGER RBRACKET (Item(INTEGER, Expr))
 
 AtomExpr : Const (Const)
   |  NAME (Var(NAME))
   |  LCHAVE Prog RCHAVE (Prog)
   |  LPAR Expr RPAR (Expr)
   |  LPAR Comps RPAR (Comps)
-  |  FN Args SETAANON Expr END (Anon(Type, NAME, Expr))      (oq entraria no lugar de Type? ListT?)
+  |  FN Args SETAANON Expr END (makeAnon(Args, Expr))      (coloquei o makeAnon)
 
 AppExpr : AtomExpr AtomExpr (Call(AtomExpr1, AtomExpr2))
   |  AppExpr AtomExpr (Call(AppExpr, AtomExpr))
 
 Const : BOOLEAN (ConB(BOOLEAN))
   |  INTEGER (ConI(INTEGER))
-  |  LPAR NIL RPAR (List [])                     (?)
-  |  LPAR Type LBRACKET RBRACKET RPAR (ESeq(SeqT))
+  |  LPAR NIL RPAR (List [])
+  |  LPAR Type LBRACKET RBRACKET RPAR (ESeq(Type))
 
 Comps : Expr VIRGULA Expr (Expr)
   |  Expr VIRGULA Comps (Comps)
@@ -81,14 +81,14 @@ Comps : Expr VIRGULA Expr (Expr)
 MatchExpr : END ([])
   |  PIPE CondExpr SETA Expr MatchExpr ((CondExpr, Expr)::MatchExpr)
 
-CondExpr : Expr (Expr)
-  |  UNDERLINE (NONE)     (???) (Está Correto!)
+CondExpr : Expr (SOME(Expr))
+  |  UNDERLINE (NONE)
 
-Args : LPAR NIL RPAR (ListT)
-  |  LPAR Params RPAR (List)    (?)
+Args : LPAR RPAR (List [])
+  |  LPAR Params RPAR (Params)    (mudei de acordo com oq eu entendi do email)
 
 Params : TypedVar (TypedVar)
-  |  TypedVar VIRGULA Params (ListT)    (?) Duvida enviada
+  |  TypedVar VIRGULA Params (Params)    (mesma coisa da de cima. email q eu enviei no dia 8)
 
 TypedVar : Type NAME (Var(NAME))
 
@@ -102,5 +102,5 @@ AtomType : NIL (ListT(NIL))
   |  INTEGER (IntT(INTEGER))
   |  LPAR Type RPAR (ListT(Type))
 
-Types : Type VIRGULA Type (ListT)      (?)
-  |  Type VIRGULA Types (ListT(ListT)) (?)
+Types : Type VIRGULA Type (Types)      (tirei os ListT e coloquei Types)
+  |  Type VIRGULA Types (Types)
