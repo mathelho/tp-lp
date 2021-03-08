@@ -9,12 +9,12 @@
     | IF | THEN | ELSE | MATCH | WITH | EXCL | TRACO | HEAD | TAIL | ISEMPTY | PRINT
     | AND | PLUS | MINUS | MULTI | DIV | EQ | DIF | LESS | LEQ | DDP | SEMIC
     | LBRACKET | RBRACKET | LCHAVE | RCHAVE | LPAR | RPAR
-    | FN | END | SETAANON | BOOLEAN | VIRGULA | PIPE | SETA | UNDERLINE
-    | NIL of plcType list
-    | NAME of string | INTEGER of int | NAT of int
+    | FN | END | SETAANON | VIRGULA | PIPE | SETA | UNDERLINE
+    | NIL of unit
+    | NAME of string | INTEGER of int | BOOLEAN of bool
     | EOF
 
-%nonterm Prog of expr | Prog of decl | Decl of expr | Expr of expr | AtomExpr of expr
+%nonterm Prog of expr | Prog of decl | Decl of expr | Expr of expr | AtomExpr of expr       (?)
 | AppExpr of expr | Const of expr | Comps of expr | MatchExpr of expr | CondExpr of expr
 | Args of expr | Params of plcType | TypedVar of plcType | Type of plcType 
 | AtomType of plcType | Types of plcType
@@ -34,8 +34,8 @@ Prog : Expr (Expr)
   |  Decl SEMIC Prog (Prog)
 
 Decl : VAR NAME EQ Expr (Let(NAME, Expr, Prog))
-  |  FUN NAME Args EQ Expr (Let(NAME, Args, Prog))
-  |  FUN REC NAME Args DP Type EQ Expr (Letrec(NAME, Type, NAME2, Type, Expr, Expr))    (com ctz tá errado)
+  |  FUN NAME Args EQ Expr (Let(NAME, Anon(ListT, Expr), Expr))
+  |  FUN REC NAME Args DP Type EQ Expr (Letrec(NAME, Type, NAME2, Type, Expr, Expr))    (?)
 
 Expr : AtomExpr (AtomExpr)
   |  AppExpr (Call(AppExpr, AppExpr))       (dois AppExpr? oq fazer)
@@ -58,21 +58,21 @@ Expr : AtomExpr (AtomExpr)
   |  Expr LEQ Expr (Prim2("<=", Expr1, Expr2))
   |  Expr DDP Expr (Prim2("::", Expr1, Expr2))
   |  Expr SEMIC Expr (Prim2(";", Expr1, Expr2))
-  |  Expr LBRACKET NAT RBRACKET (ESeq(NAT))     (n sei se é assim que implementa o nat)
+  |  Expr LBRACKET INTEGER RBRACKET (Item(INTEGER))
 
 AtomExpr : Const (Const)
   |  NAME (Var(NAME))
   |  LCHAVE Prog RCHAVE (Prog)
   |  LPAR Expr RPAR (Expr)
   |  LPAR Comps RPAR (Comps)
-  |  FN Args SETAANON Expr END (Anon(Types, Args, Expr))      (oq entraria no lugar de types?)
+  |  FN Args SETAANON Expr END (Anon(Type, NAME, Expr))      (oq entraria no lugar de Type? ListT?)
 
-AppExpr : AtomExpr AtomExpr (AtomExpr)
+AppExpr : AtomExpr AtomExpr (Call(AtomExpr1, AtomExpr2))
   |  AppExpr AtomExpr (Call(AppExpr, AtomExpr))
 
 Const : BOOLEAN (ConB(BOOLEAN))
-  |  NAT (ConI(NAT))
-  |  LPAR NIL RPAR (List(NIL))      (n entendi como usa o nil)
+  |  INTEGER (ConI(INTEGER))
+  |  LPAR NIL RPAR (List [])                     (?)
   |  LPAR Type LBRACKET RBRACKET RPAR (ESeq(SeqT))
 
 Comps : Expr VIRGULA Expr (Expr)
@@ -82,13 +82,13 @@ MatchExpr : END ([])
   |  PIPE CondExpr SETA Expr MatchExpr ((CondExpr, Expr)::MatchExpr)
 
 CondExpr : Expr (Expr)
-  |  UNDERLINE (None)     (???)
+  |  UNDERLINE (NONE)     (???) (Está Correto!)
 
-Args : LPAR NIL RPAR (List(NIL))
-  |  LPAR Params RPAR (Anon(Params))    (?)
+Args : LPAR NIL RPAR (ListT)
+  |  LPAR Params RPAR (List)    (?)
 
 Params : TypedVar (TypedVar)
-  |  TypedVar VIRGULA Params      (?)
+  |  TypedVar VIRGULA Params (ListT)    (?) Duvida enviada
 
 TypedVar : Type NAME (Var(NAME))
 
@@ -102,5 +102,5 @@ AtomType : NIL (ListT(NIL))
   |  INTEGER (IntT(INTEGER))
   |  LPAR Type RPAR (ListT(Type))
 
-Types : Type VIRGULA Type (?)
-  |  Type VIRGULA Types (?)
+Types : Type VIRGULA Type (ListT)      (?)
+  |  Type VIRGULA Types (ListT(ListT)) (?)
