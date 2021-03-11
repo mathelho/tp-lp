@@ -69,7 +69,6 @@ whitespace=[\ \t];
 "=" => (EQ(yypos, yypos));
 ":" => (DP(yypos, yypos));
 "!" => (EXCL(yypos, yypos));
-"-" => (NEGATIVO(yypos, yypos));
 "&&" => (AND(yypos, yypos));
 "+" => (PLUS(yypos, yypos));
 "-" => (MINUS(yypos, yypos));
