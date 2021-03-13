@@ -29,7 +29,7 @@ fun keyword (s, lpos, rpos) =
         | "tl" => TAIL (lpos, rpos)
         | "true" => BOOLEAN (s, lpos, rpos)
         | "with" => WITH (lpos, rpos)
-        | "_" => UNDERLINE (lpos, rpos)
+        | "_" => UNDERLINE (s, lpos, rpos)
         | _ => NAME (s, lpos, rpos)
 
 (* A function to print a message error on the screen. *)

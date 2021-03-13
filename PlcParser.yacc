@@ -42,8 +42,8 @@ Prog : Expr (Expr)
   |  Decl (Decl)
 
 Decl : VAR NAME EQ Expr SEMIC Prog (Let(NAME, Expr, Prog))
-  |  FUN NAME Args EQ Expr (Let(NAME, makeAnon(Args, Expr), Prog))
-  |  FUN REC NAME Args DP Type EQ Expr (makeFun(NAME, Args, Type, Expr, Prog))
+  |  FUN NAME Args EQ Expr SEMIC Prog (Let(NAME, makeAnon(Args, Expr), Prog))
+  |  FUN REC NAME Args DP Type EQ Expr SEMIC Prog (makeFun(NAME, Args, Type, Expr, Prog))
 
 Expr : AtomExpr (AtomExpr)
   |  AppExpr (AppExpr)
