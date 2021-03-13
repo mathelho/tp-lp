@@ -10,7 +10,7 @@
     | AND | PLUS | MINUS | MULTI | DIV | EQ | DIF | LESS | LEQ | DDP | SEMIC
     | LBRACKET | RBRACKET | LCHAVE | RCHAVE | LPAR | RPAR
     | FN | END | SETAANON | VIRGULA | PIPE | SETA | UNDERLINE
-    | NIL of unit
+    | NIL
     | NAME of string | INTEGER of int | BOOLEAN of bool
     | EOF
 
