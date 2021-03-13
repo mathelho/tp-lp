@@ -3,10 +3,13 @@ sig
 type ('a,'b) token
 type svalue
 val EOF:  'a * 'a -> (svalue,'a) token
-val BOOLEAN: (bool) *  'a * 'a -> (svalue,'a) token
+val FALSE: (bool) *  'a * 'a -> (svalue,'a) token
+val TRUE: (bool) *  'a * 'a -> (svalue,'a) token
 val INTEGER: (int) *  'a * 'a -> (svalue,'a) token
 val NAME: (string) *  'a * 'a -> (svalue,'a) token
-val NIL: (unit) *  'a * 'a -> (svalue,'a) token
+val INT:  'a * 'a -> (svalue,'a) token
+val BOOLEAN:  'a * 'a -> (svalue,'a) token
+val NIL:  'a * 'a -> (svalue,'a) token
 val UNDERLINE:  'a * 'a -> (svalue,'a) token
 val SETA:  'a * 'a -> (svalue,'a) token
 val PIPE:  'a * 'a -> (svalue,'a) token

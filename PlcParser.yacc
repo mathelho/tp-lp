@@ -10,8 +10,8 @@
     | AND | PLUS | MINUS | MULTI | DIV | EQ | DIF | LESS | LEQ | DDP | SEMIC
     | LBRACKET | RBRACKET | LCHAVE | RCHAVE | LPAR | RPAR
     | FN | END | SETAANON | VIRGULA | PIPE | SETA | UNDERLINE
-    | NIL
-    | NAME of string | INTEGER of int | BOOLEAN of bool
+    | NIL | BOOLEAN | INT
+    | NAME of string | INTEGER of int | TRUE of bool | FALSE of bool
     | EOF
 
 %nonterm Prog of expr | Decl of expr | Expr of expr | AtomExpr of expr | AppExpr of expr 
@@ -19,8 +19,8 @@
 | Args of (plcType * string) list | Params of (plcType * string) list | TypedVar of plcType * string
 | Type of plcType | AtomType of plcType | Types of plcType list
 
-%nonassoc IF EXCL HEAD TAIL ISEMPTY PRINT NAME
 %right SEMIC SETA
+%nonassoc IF
 %left ELSE
 %left AND
 %left EQ DIF
@@ -28,6 +28,7 @@
 %right DDP
 %left PLUS MINUS
 %left MULTI DIV
+%nonassoc EXCL HEAD TAIL ISEMPTY PRINT NAME
 %left LBRACKET
 
 %eop EOF
@@ -78,7 +79,8 @@ AtomExpr : Const (Const)
 AppExpr : AtomExpr AtomExpr (Call(AtomExpr1, AtomExpr2))
   |  AppExpr AtomExpr (Call(AppExpr, AtomExpr))
 
-Const : BOOLEAN (ConB(BOOLEAN))
+Const : TRUE (ConB(true))
+  |  FALSE (ConB(false))
   |  INTEGER (ConI(INTEGER))
   |  LPAR RPAR (List [])
   |  LPAR Type LBRACKET RBRACKET RPAR (ESeq(Type))
@@ -107,7 +109,7 @@ Type : AtomType (AtomType)
 
 AtomType : NIL (ListT [])
   |  BOOLEAN (BoolT)
-  |  INTEGER (IntT)
+  |  INT (IntT)
   |  LPAR Type RPAR (Type)
 
 Types : Type VIRGULA Type (Type1::Type2::[])

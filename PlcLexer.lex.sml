@@ -12,28 +12,33 @@ type slvalue = Tokens.svalue
 type ('a,'b) token = ('a,'b) Tokens.token
 type lexresult = (slvalue, pos)token
 
+fun strToInt s =
+    case Int.fromString s of
+        SOME i => i
+    |   NONE => raise Fail ("Could not convert string '" ^ s ^ "' to integer")
+
 fun keyword (s, lpos, rpos) =
     case s of
         "var" => VAR (lpos, rpos)
-        | "Bool" => BOOLEAN (s, lpos, rpos)
+        | "Bool" => BOOLEAN (lpos, rpos)
         | "else" => ELSE (lpos, rpos)
         | "end" => END (lpos, rpos)
-        | "false" => BOOLEAN (s, lpos, rpos)
+        | "false" => FALSE (false, lpos, rpos)
         | "fn" => FN (lpos, rpos)
         | "fun" => FUN (lpos, rpos)
         | "hd" => HEAD (lpos, rpos)
         | "if" => IF (lpos, rpos)
-        | "Int" => INTEGER (strToInt(s), lpos, rpos)
+        | "Int" => INT (lpos, rpos)
         | "ise" => ISEMPTY (lpos, rpos)
         | "match" => MATCH (lpos, rpos)
-        | "Nil" => NIL (s, lpos, rpos)
-        | "print" => PRINT (s, lpos, rpos)
+        | "Nil" => NIL (lpos, rpos)
+        | "print" => PRINT (lpos, rpos)
         | "rec" => REC (lpos, rpos)
         | "then" => THEN (lpos, rpos)
         | "tl" => TAIL (lpos, rpos)
-        | "true" => BOOLEAN (s, lpos, rpos)
+        | "true" => TRUE (true, lpos, rpos)
         | "with" => WITH (lpos, rpos)
-        | "_" => UNDERLINE (s, lpos, rpos)
+        | "_" => UNDERLINE (lpos, rpos)
         | _ => NAME (s, lpos, rpos)
 
 (* A function to print a message error on the screen. *)
@@ -47,11 +52,6 @@ fun getLineAsString() =
     in
         Int.toString lineNum
     end
-
-fun strToInt s =
-    case Int.fromString s of
-        SOME i => i
-    |   NONE => raise Fail ("Could not convert string '" ^ s ^ "' to integer")
 
 (* Define what to do when the end of the file is reached. *)
 fun eof () = Tokens.EOF(0,0)

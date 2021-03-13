@@ -16,15 +16,15 @@ fun strToInt s =
 fun keyword (s, lpos, rpos) =
     case s of
         "var" => VAR (lpos, rpos)
-        | "Bool" => BOOLEAN (bool, lpos, rpos)
+        | "Bool" => BOOLEAN (lpos, rpos)
         | "else" => ELSE (lpos, rpos)
         | "end" => END (lpos, rpos)
-        | "false" => BOOLEAN (false, lpos, rpos)
+        | "false" => FALSE (false, lpos, rpos)
         | "fn" => FN (lpos, rpos)
         | "fun" => FUN (lpos, rpos)
         | "hd" => HEAD (lpos, rpos)
         | "if" => IF (lpos, rpos)
-        | "Int" => INTEGER (strToInt(s), lpos, rpos)
+        | "Int" => INT (lpos, rpos)
         | "ise" => ISEMPTY (lpos, rpos)
         | "match" => MATCH (lpos, rpos)
         | "Nil" => NIL (lpos, rpos)
@@ -32,7 +32,7 @@ fun keyword (s, lpos, rpos) =
         | "rec" => REC (lpos, rpos)
         | "then" => THEN (lpos, rpos)
         | "tl" => TAIL (lpos, rpos)
-        | "true" => BOOLEAN (true, lpos, rpos)
+        | "true" => TRUE (true, lpos, rpos)
         | "with" => WITH (lpos, rpos)
         | "_" => UNDERLINE (lpos, rpos)
         | _ => NAME (s, lpos, rpos)
@@ -58,13 +58,13 @@ fun init() = ()
 %header (functor PlcLexerFun(structure Tokens: PlcParser_TOKENS));
 alpha=[A-Za-z];
 name=[a-zA-Z_][a-zA-Z_0-9]*;
-nat=[0-9];
+digit=[0-9];
 whitespace=[\ \t];
 %%
 
 \n => (lineNumber := !lineNumber + 1; lex());
 {whitespace}+ => (lex());
-{nat}+ => (INTEGER(strToInt(yytext), yypos, yypos));
+{digit}+ => (INTEGER(strToInt(yytext), yypos, yypos));
 {name} => (keyword(yytext, yypos, yypos));
 "=" => (EQ(yypos, yypos));
 ":" => (DP(yypos, yypos));
