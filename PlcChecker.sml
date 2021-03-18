@@ -34,7 +34,7 @@ fun teval (e:expr) (p:plcType env): plcType =
             in
                 teval e2 ((x, t1)::p)
             end
-        | (Letrec((f:string), (t:plcType), (x:string), (t1:plcType), (e1:expr), (e2:expr))) =>
+        | (Letrec((f:string), (t:plcType), (x:string), (t1:plcType), (e1:expr), (e2:expr))) =>  (* verificar *)
             let
                 val tipo1 = teval e1 ((f, FunT(t, t1))::(x, t)::p)
             in
@@ -56,7 +56,7 @@ fun teval (e:expr) (p:plcType env): plcType =
             in
                 if teval e2 p = FunT(t1, t2) then t2 else raise CallTypeMisM
             end
-        | (If((e:expr), (e1:expr), (e2:expr))) =>
+        | (If((e:expr), (e1:expr), (e2:expr))) =>   (* verificar *)
             let
                 val t = teval e p
                 val t1 = teval e1 p
@@ -68,8 +68,44 @@ fun teval (e:expr) (p:plcType env): plcType =
             let
                 val lista = map(fn (x, y) => ((teval (getOpt(x, (List []))) p), (teval y p))) l
                 fun excecao [] p = raise NoMatchResults
-                |   excecao ((ei, ri)::[]) p = if ei = (LisT []) then ri else if ei = teval e p then ri else raise MatchCondTypesDiff
+                |   excecao ((ei, ri)::[]) p = if ei = (ListT []) then ri else if ei = teval e p then ri else raise MatchCondTypesDiff
                 |   excecao ((ei, ri)::(en, rn)::t) p = if ei <> teval e p then raise MatchCondTypesDiff else if ri = rn then excecao((en, rn)::t) p else raise MatchResTypeDiff
             in
                 excecao lista p
+            end
+        | (Prim1("!", (e:expr))) =>
+            let
+                val t1 = teval e p
+            in
+                if t1 = BoolT then BoolT else raise UnknownType
+            end
+        | (Prim1("-", (e:expr))) =>
+            let
+                val t1 = teval e p
+            in
+                if t1 = InT then IntT else raise UnknownType
+            end
+        | (Prim1("hd", (e:expr))) =>    (* verificar *)
+            let
+                val t1 = teval e p
+            in
+                if t1 = SeqT then t1 else raise UnknownType
+            end
+        | (Prim1("tl", (e:expr))) =>    (* verificar *)
+            let
+                val t1 = teval e p
+            in
+                if t1 = SeqT then SeqT else raise UnknownType
+            end
+        | (Prim1("ise", (e:expr))) =>   (* verificar *)
+            let
+                val t1 = teval e p
+            in
+                if t1 = SeqT then BoolT else raise UnknownType
+            end
+        | (Prim1("print", (e:expr))) =>
+            let
+                val t1 = teval e p
+            in
+                ListT []
             end
