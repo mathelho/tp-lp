@@ -14,29 +14,29 @@ use "Environ.sml";
 
 fun run e = 
     let 
-        val typeEvaluation = (teval(e))
-        (*(val valueEvaluation = (eval(e)))*)
+        val typeEvaluation = type2string(teval(e))
+        val valueEvaluation = val2string(eval(e))
     in
-        "valueEvaluation" ^ " : "(* ^ valueEvaluation*) (*Especificando a saída conforme informado no fórum.*)
+        valueEvaluation ^ " : "^ typeEvaluation (*Especificando a saída conforme informado no fórum.*)
         (* Vamos fazer com string pro enquanto. Dps temos que arrumar uma conversão para string*)
     end
     handle
         EmptySeq => "É uma sequência vazia"
         | UnknownType => "O tipo é desconhecido"
-        | NotEqTypes => "A igualdade não funciona para estes tipos"
+        | NotEqTypes => "A igualdade não funciona pois os tipos são diferentes"
         | WrongRetType => "O tipo de retorno está incorreto"
         | DiffBrTypes => "Os valores para o if-then-else estão diferentes"
         | IfCondNotBool => "A expressão contida no 'if' não é do tipo Bool"
         | NoMatchResults => "Não há resultados para fazer o o match"
         | MatchResTypeDiff => "Os tipos dos resultados no match estão diferentes"
         | MatchCondTypesDiff => "As expressões para realizar o match são de tipos diferentes da do match"
-        | CallTypeMisM => "" (*Verificar do que se trata*)
+        | CallTypeMisM => "Passando pra uma chamada de função um tipo diferente do qual ela suporta"
         | NotFunc => "O valor não é uma função"
-        | ListOutOfRange => "O índice está fora do tamanho lista"
-        | OpNonList => "A operação não é uma lista"
+        | ListOutOfRange => "O índice está fora do tamanho da lista"
+        | OpNonList => "Não é possível acessar um elemento em uma expressão que não é uma lista"
         | Impossible => "Impossivel realizar a ação"
-        | HDEmptySeq => "" (*Verificar do que se trata*)
-        | TLEmptySeq => "" (*Verificar do que se trata*)
+        | HDEmptySeq => "Não é possível acessar a cabeça de uma sequência vazia" (*Verificar do que se trata*)
+        | TLEmptySeq => "Não é possível acessar a cauda de uma sequência vazia" (*Verificar do que se trata*)
         | ValueNotFoundInMatch => "O valor não foi encontrado no match"
         | NotAFunc => "O valor não corresponde a uma função"
         (*Exceção que ele mencionou no fórum, do Environ.sml*)

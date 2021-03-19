@@ -7,3 +7,8 @@ exception HDEmptySeq
 exception TLEmptySeq
 exception ValueNotFoundInMatch
 exception NotAFunc
+
+fun eval (e:expr) (p:plcVal env): plcVal =
+    case e of
+        (ConI x) => (IntV x)
+        | _ => raise Impossible;
