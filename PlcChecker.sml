@@ -88,25 +88,25 @@ fun teval (e:expr) (p:plcType env): plcType =
             let
                 val t1 = teval e p
             in
-                if t1 = InT then IntT else raise UnknownType
+                if t1 = IntT then IntT else raise UnknownType
             end
         | (Prim1("hd", (e:expr))) =>    (* verificar *)
             let
                 val t1 = teval e p
             in
-                if t1 = SeqT then t1 else raise UnknownType
+                if t1 = (SeqT t1) then t1 else raise UnknownType
             end
         | (Prim1("tl", (e:expr))) =>    (* verificar *)
             let
                 val t1 = teval e p
             in
-                if t1 = SeqT then SeqT else raise UnknownType
+                if t1 = (SeqT t1) then t1 else raise UnknownType
             end
         | (Prim1("ise", (e:expr))) =>   (* verificar *)
             let
                 val t1 = teval e p
             in
-                if t1 = SeqT then BoolT else raise UnknownType
+                if t1 = (SeqT t1) then BoolT else raise UnknownType
             end
         | (Prim1("print", (e:expr))) =>
             let
