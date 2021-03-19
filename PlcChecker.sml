@@ -1,4 +1,9 @@
 (* PlcChecker *)
+(*Definir todas as funções de avaliação relacionadas ao tval
+e ele inclusive, devem ficar aqui, e deixaremos somente o run para o Plc.sml*)
+(*Ainda precisaremos lidar com as funções de avaliação
+de vários tipos dentro de uma lista --- Pesquisar depois ---*)
+
 
 exception EmptySeq
 exception UnknownType
@@ -16,10 +21,10 @@ exception OpNonList
 
 fun teval (e:expr) (p:plcType env): plcType =
     case e of
-        (Var x) => p x
+        (Var x) => lookup p x (*lookup vem do Envirom.sml*)
         | (ConI _) =>  IntT
-        | (ConB _) =>  BoolT
-        | (List []) => ListT
+        | (ConB _) =>  BoolT (*Bool está definido para TRUE e FALSE*)
+        | (List []) => ListT [] (*O ListT tem que ser uma lista vazia também*)
         | (List l) =>
             let
                 val lista = map(fn x => teval x p) l
@@ -68,7 +73,7 @@ fun teval (e:expr) (p:plcType env): plcType =
             let
                 val lista = map(fn (x, y) => ((teval (getOpt(x, (List []))) p), (teval y p))) l
                 fun excecao [] p = raise NoMatchResults
-                |   excecao ((ei, ri)::[]) p = if ei = (LisT []) then ri else if ei = teval e p then ri else raise MatchCondTypesDiff
+                |   excecao ((ei, ri)::[]) p = if ei = (ListT []) then ri else if ei = teval e p then ri else raise MatchCondTypesDiff
                 |   excecao ((ei, ri)::(en, rn)::t) p = if ei <> teval e p then raise MatchCondTypesDiff else if ri = rn then excecao((en, rn)::t) p else raise MatchResTypeDiff
             in
                 excecao lista p
