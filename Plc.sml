@@ -14,8 +14,8 @@ use "Environ.sml";
 
 fun run e = 
     let 
-        val typeEvaluation = type2string(teval(e))
-        val valueEvaluation = val2string(eval(e))
+        val typeEvaluation = type2string(teval e [])
+        val valueEvaluation = val2string(eval e [])
     in
         valueEvaluation ^ " : "^ typeEvaluation (*Especificando a saída conforme informado no fórum.*)
         (* Vamos fazer com string pro enquanto. Dps temos que arrumar uma conversão para string*)

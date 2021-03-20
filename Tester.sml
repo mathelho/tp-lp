@@ -21,3 +21,5 @@ Control.Print.stringDepth := 1000;
 open PlcFrontEnd;
 
 run (fromString "15");
+run (fromString "true");
+run (fromString "()");
