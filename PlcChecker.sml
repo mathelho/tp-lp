@@ -19,6 +19,7 @@ exception NotFunc
 exception ListOutOfRange
 exception OpNonList
 
+(*Funcoes axiliazres para determinar o Prim1 e Prim2*)
 fun ehSequencia (SeqT t: plcType) = true
     |   ehSequencia _ = false;
 
@@ -30,6 +31,7 @@ fun supIgualdade IntT = true    (* verifica se o plcType suporta operações de 
     |   supIgualdade (SeqT (t)) = supIgualdade t
     |   supIgualdade _ = false;
 
+(*Funcao Principal: tval*)
 fun teval (e:expr) (p:plcType env): plcType =
     case e of
         (Var x) => lookup p x (*lookup vem do Envirom.sml*)
@@ -89,125 +91,41 @@ fun teval (e:expr) (p:plcType env): plcType =
             in
                 excecao lista p
             end
-        | (Prim1("!", (e:expr))) =>
-            let
-                val t1 = teval e p
-            in
-                if t1 = BoolT then BoolT else raise UnknownType
-            end
-        | (Prim1("-", (e:expr))) =>
-            let
-                val t1 = teval e p
-            in
-                if t1 = IntT then IntT else raise UnknownType
-            end
-        | (Prim1("hd", (e:expr))) =>    (* verificar *)
+        | (Prim1(operador, (e:expr))) =>
             let
                 fun excecao (SeqT tipo) = tipo
                 |   excecao _ = raise UnknownType
                 val t1 = teval e p
-            in
-                if ehSequencia t1 then excecao t1 else raise UnknownType
+            in case operador of
+                "print" => ListT []
+                | "!" => if t1 = BoolT then BoolT else raise UnknownType
+                | "-" => if t1 = IntT then IntT else raise UnknownType
+                | "hd" => if ehSequencia t1 then excecao t1 else raise UnknownType
+                | "tl" => if ehSequencia t1 then t1 else raise UnknownType
+                | "ise" => if ehSequencia t1 then BoolT else raise UnknownType
+                | _ => raise UnknownType
             end
-        | (Prim1("tl", (e:expr))) =>    (* verificar *)
-            let
-                val t1 = teval e p
-            in
-                if ehSequencia t1 then t1 else raise UnknownType
-            end
-        | (Prim1("ise", (e:expr))) =>   (* verificar *)
-            let
-                val t1 = teval e p
-            in
-                if ehSequencia t1 then BoolT else raise UnknownType
-            end
-        | (Prim1("print", (e:expr))) =>
-            let
-                val t1 = teval e p
-            in
-                ListT []
-            end
-        | (Prim2("&&", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = BoolT andalso t2 = BoolT then BoolT else raise UnknownType
-            end
-        | (Prim2("::", (e1:expr), (e2:expr))) =>
+        | (Prim2(operador, (e1:expr), (e2:expr))) =>
             let
                 fun excecao (SeqT tipo) = tipo
                 |   excecao _ = raise UnknownType
                 val t1 = teval e1 p
                 val t2 = teval e2 p
-            in
-                if ehSequencia t2 andalso t1 = excecao t2 then t2 else raise UnknownType
-            end
-        | (Prim2("+", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
-            end
-        | (Prim2("-", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
-            end
-        | (Prim2("*", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
-            end
-        | (Prim2("/", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
-            end
-        | (Prim2("<", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then BoolT else raise UnknownType
-            end
-        | (Prim2("<=", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if t1 = IntT andalso t2 = IntT then BoolT else raise UnknownType
-            end
-        | (Prim2("=", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if not (supIgualdade t1) orelse not (supIgualdade t2) then raise NotEqTypes else if t1 = t2 then BoolT else raise UnknownType
-            end
-        | (Prim2("!=", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                if not (supIgualdade t1) orelse not (supIgualdade t2) then raise NotEqTypes else if t1 = t2 then BoolT else raise UnknownType
+            in case operador of
+                 "&&" => if t1 = BoolT andalso t2 = BoolT then BoolT else raise UnknownType
+                | "::" => if ehSequencia t2 andalso t1 = excecao t2 then t2 else raise UnknownType
+                | "+" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
+                | "-" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
+                | "*" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
+                | "/" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
+                | "<" => if t1 = IntT andalso t2 = IntT then BoolT else raise UnknownType
+                | "<=" => if t1 = IntT andalso t2 = IntT then BoolT else raise UnknownType
+                | "=" => if not (supIgualdade t1) orelse not (supIgualdade t2) then raise NotEqTypes else if t1 = t2 then BoolT else raise UnknownType
+                | "!=" => if not (supIgualdade t1) orelse not (supIgualdade t2) then raise NotEqTypes else if t1 = t2 then BoolT else raise UnknownType
+                | ";" => t2
+                | _ => raise UnknownType
             end
         | (Item (i, List [])) => raise ListOutOfRange
         | (Item (0, List(h::t))) => teval h p
         | (Item (i, List(h::t))) => teval (Item (i - 1, (List t))) p
         | (Item (_, _)) => raise OpNonList
-        | (Prim2(";", (e1:expr), (e2:expr))) =>
-            let
-                val t1 = teval e1 p
-                val t2 = teval e2 p
-            in
-                t2
-            end
-        | _ => raise UnknownType;

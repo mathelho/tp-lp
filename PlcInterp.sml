@@ -94,36 +94,104 @@ fun eval (e:expr) (p:plcVal env): plcVal =
                 |   _ => raise Impossible
             end
         | (Anon (t, x, e)) => Clos("", x, e, p)
-        | (Prim1 ("print", e)) =>
+        | (Prim1 (operador, e)) =>
             let
                 val t = eval e p
-            in
+            in  
                 case t of IntV x =>
-                    let
-                        val t = IntV x
-                        val vazio = print(val2string(t) ^ "\n")
-                    in
-                        ListV []
+                    let in
+                        case operador of "print" => 
+                            let
+                                val t = IntV x
+                                val vazio = print(val2string(t) ^ "\n")
+                            in
+                                ListV []
+                            end
+                        | "-" => IntV (~ x)
+                        | _ => raise Impossible
                     end
-                | BoolV x =>
-                    let
-                        val t = BoolV x
-                        val vazio = print(val2string(t) ^ "\n")
-                    in
-                        ListV []
+                    | BoolV x =>
+                        let in
+                        case operador of "print" =>
+                            let
+                                val t = BoolV x
+                                val vazio = print(val2string(t) ^ "\n")
+                            in
+                                ListV []
+                            end
+                        | "!" => BoolV (not x)
+                        | _ => raise Impossible
                     end
-                | SeqV x =>
-                    let
-                        val vazio = print(list2string(val2string, x) ^ "\n")
-                    in
-                        ListV []
+                    | SeqV x =>
+                        let in
+                        case operador of "print" =>
+                            let
+                                val vazio = print(list2string(val2string, x) ^ "\n")
+                            in
+                                ListV []
+                            end
+                        | "hd" => let in let in hd x end handle Empty => raise HDEmptySeq end
+                        | "tl" => let in let in SeqV (tl x) end handle Empty => raise TLEmptySeq end
+                        | "ise" =>
+                            let in
+                            case x of
+                                [] => BoolV true
+                            | _ => BoolV false
+                            end
+                        | _ => raise Impossible
                     end
-                | ListV x =>
-                    let
-                        val vazio = print(list2string(val2string, x) ^ "\n")
-                    in
-                        ListV []
+                    | ListV x =>
+                        let in
+                        case operador of "print" =>
+                            let
+                                val vazio = print(list2string(val2string, x) ^ "\n")
+                            in
+                                ListV []
+                            end
+                        | _ => raise Impossible
                     end
-                | _ => raise Impossible
-            end
-        | _ => raise Impossible;
+                    | _ => raise Impossible
+                end
+        (*No caso do Prim2 acho mais vantagem fazer case of do t primeiro, e depois o operador*)
+        | (Prim2 (operador, e1, e2)) =>
+            if operador = ";" then let val vazio = eval e1 p in eval e2 p end
+            else let
+                val value1 = eval e1 p
+                val value2 = eval e2 p
+                in case (value1, value2) of (IntV inteiro1, IntV inteiro2) => 
+                    let in
+                        case operador of "+" => IntV (inteiro1 + inteiro2)
+                        | "-" => IntV (inteiro1 - inteiro2)
+                        | "*" => IntV (inteiro1 * inteiro2)
+                        | "/" => IntV (inteiro1 div inteiro2)
+                        | "<" => BoolV (inteiro1 < inteiro2)
+                        | "<=" => BoolV (inteiro1 <= inteiro2)
+                        | "=" => BoolV (inteiro1 = inteiro2)
+                        | "!=" => BoolV (inteiro1 <> inteiro2)
+                        | _ => raise Impossible
+                    end
+                    | (BoolV booleano1, BoolV booleano2) => 
+                        let in
+                            case operador of "&&" => BoolV (booleano1 andalso booleano2)
+                            | "=" => BoolV (booleano1 = booleano2)
+                            | "!=" => BoolV (booleano1 <> booleano2)
+                            | _ => raise Impossible
+                        end
+                    | (IntV inteiro1, SeqV sequencia) => 
+                        let in
+                            case operador of "::" => SeqV (IntV inteiro1 :: sequencia)
+                            | _ => raise Impossible
+                        end
+                    | (BoolV booleano1, SeqV sequencia) => 
+                        let in
+                            case operador of "::" => SeqV (BoolV booleano1 :: sequencia)
+                            | _ => raise Impossible
+                        end
+                    | (ListV lista1, SeqV sequencia) => 
+                        let in
+                            case operador of "::" => SeqV (ListV lista1 :: sequencia)
+                            | _ => raise Impossible
+                        end
+                    | _ => raise Impossible
+                end
+;

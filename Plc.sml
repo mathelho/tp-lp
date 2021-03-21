@@ -10,7 +10,10 @@ Vamos começar por casos simples*)
 use "PlcChecker.sml";
 use "PlcInterp.sml";
 use "Environ.sml";
-(*Determinar se usaremos acentos ou não '.'*)
+(*Determinar se usaremos acentos ou não '.'
+Não, usaremos, da erro nos caracteres. Testei aqui*)
+
+(*Ele fala sobre como lidar com as Exceções na aula: 2020-10-05 DCC024 LP - Tratamento de Erros 6*)
 
 fun run e = 
     let 
@@ -21,25 +24,26 @@ fun run e =
         (* Vamos fazer com string pro enquanto. Dps temos que arrumar uma conversão para string*)
     end
     handle
-        EmptySeq => "É uma sequência vazia"
-        | UnknownType => "O tipo é desconhecido"
-        | NotEqTypes => "A igualdade não funciona pois os tipos são diferentes"
-        | WrongRetType => "O tipo de retorno está incorreto"
-        | DiffBrTypes => "Os valores para o if-then-else estão diferentes"
-        | IfCondNotBool => "A expressão contida no 'if' não é do tipo Bool"
-        | NoMatchResults => "Não há resultados para fazer o o match"
-        | MatchResTypeDiff => "Os tipos dos resultados no match estão diferentes"
-        | MatchCondTypesDiff => "As expressões para realizar o match são de tipos diferentes da do match"
-        | CallTypeMisM => "Passando pra uma chamada de função um tipo diferente do qual ela suporta"
-        | NotFunc => "O valor não é uma função"
-        | ListOutOfRange => "O índice está fora do tamanho da lista"
-        | OpNonList => "Não é possível acessar um elemento em uma expressão que não é uma lista"
-        | Impossible => "Impossivel realizar a ação"
-        | HDEmptySeq => "Não é possível acessar a cabeça de uma sequência vazia" (*Verificar do que se trata*)
-        | TLEmptySeq => "Não é possível acessar a cauda de uma sequência vazia" (*Verificar do que se trata*)
-        | ValueNotFoundInMatch => "O valor não foi encontrado no match"
-        | NotAFunc => "O valor não corresponde a uma função"
+        EmptySeq => "EXCECAO: E uma sequencia vazia"
+        | UnknownType => "EXCECAO: O tipo e desconhecido"
+        | NotEqTypes => "EXCECAO: A igualdade nao funciona pois os tipos sao diferentes"
+        | WrongRetType => "EXCECAO: O tipo de retorno esta incorreto"
+        | DiffBrTypes => "EXCECAO: Os valores para o if-then-else estao diferentes"
+        | IfCondNotBool => "EXCECAO: A expressao contida no 'if' não e do tipo Bool"
+        | NoMatchResults => "EXCECAO: Nao ha resultados para fazer o o match"
+        | MatchResTypeDiff => "EXCECAO: Os tipos dos resultados no match estao diferentes"
+        | MatchCondTypesDiff => "EXCECAO: As expressoes para realizar o match sao de tipos diferentes da do match"
+        | CallTypeMisM => "EXCECAO: Passando pra uma chamada de funcao um tipo diferente do qual ela suporta"
+        | NotFunc => "EXCECAO: O valor nao e uma funcao"
+        | ListOutOfRange => "EXCECAO: O indice esta fora do tamanho da lista"
+        | OpNonList => "EXCECAO: Nao e possivel acessar um elemento em uma expressao que nao e uma lista"
+        | Impossible => "EXCECAO: Impossivel realizar a acao"
+        | HDEmptySeq => "EXCECAO: Nao e possível acessar a cabeça de uma sequencia vazia"
+        | TLEmptySeq => "EXCECAO: Nao e possível acessar a cauda de uma sequencia vazia"
+        | ValueNotFoundInMatch => "EXCECAO: O valor nao foi encontrado no match"
+        | NotAFunc => "EXCECAO: O valor nao corresponde a uma funcao"
         (*Exceção que ele mencionou no fórum, do Environ.sml*)
-        | SymbolNotFound => "Algum simbolo não fora encontrado" (*Verificar do que se trata*)
+        | SymbolNotFound => "EXCECAO: Algum simbolo nao fora encontrado"
+        | _ => "EXCECAO: Erro Desconhecido"
     
     (*Verificar o arquivo Envirom.sml, acho que tem funções dele que usaremos, segundo a Doc*)
