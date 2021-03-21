@@ -31,7 +31,10 @@ fun supIgualdade IntT = true    (*Verifica se o plcType suporta operações de i
 (*Funcao Principal: tval*)
 fun teval (e:expr) (p:plcType env): plcType =
     case e of
-        (Var x) => lookup p x (*lookup vem do Envirom.sml*)
+        (Var x) => 
+            let in
+                (lookup p x) handle SymbolNotFound => raise SymbolNotFound (*lookup vem do Envirom.sml*)
+            end
         | (ConI _) =>  IntT
         | (ConB _) =>  BoolT (*Bool está definido para TRUE e FALSE*)
         | (List []) => ListT [] (*O ListT tem que ser uma lista vazia também*)
