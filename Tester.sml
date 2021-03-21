@@ -32,12 +32,12 @@ run (fromString "true");
 run (fromString "()");
 run (fromString "(6,false)[1]");
 run (fromString "([Bool] [])");
-run (fromString "print x");
-run (fromString "3::7::t");
+run (fromString "var x = 2; print x");
+run (fromString "3::7::t"); (* o t não está declarado e run não recebe ambiente, então vai levantar exceção*)
 run (fromString "fn (Int x) => -x end");
 run (fromString "var x = 9; x + 3");
 run (fromString "fun f(Int x) = x; f(1)");
-run (fromString "match x with | 0 -> 1| _ -> -1 end");
+run (fromString "var x = 0; match x with | 0 -> 1| _ -> -1 end");
 
 (*Alguns testes com o Teval - Todos rodam(menos o comentado), com ou sem ambiente vazio; alguns cairam nas excecoes - ...SUCESSO*)
 teval (fromString "print x; false") [("x", BoolT)];
