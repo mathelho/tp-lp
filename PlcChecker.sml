@@ -19,11 +19,8 @@ exception NotFunc
 exception ListOutOfRange
 exception OpNonList
 
-(*Funcoes axiliazres para determinar o Prim1 e Prim2*)
-fun ehSequencia (SeqT t: plcType) = true
-    |   ehSequencia _ = false;
-
-fun supIgualdade IntT = true    (* verifica se o plcType suporta operações de igualdade*)
+(*Funcao auxiliar para ajudar na denificao dos operadores "=" e "!=" no Prim2*)
+fun supIgualdade IntT = true    (*Verifica se o plcType suporta operações de igualdade*)
     |   supIgualdade BoolT = true
     |   supIgualdade (ListT []) = true
     |   supIgualdade (ListT (h::[])) = supIgualdade h
@@ -100,9 +97,9 @@ fun teval (e:expr) (p:plcType env): plcType =
                 "print" => ListT []
                 | "!" => if t1 = BoolT then BoolT else raise UnknownType
                 | "-" => if t1 = IntT then IntT else raise UnknownType
-                | "hd" => if ehSequencia t1 then excecao t1 else raise UnknownType
-                | "tl" => if ehSequencia t1 then t1 else raise UnknownType
-                | "ise" => if ehSequencia t1 then BoolT else raise UnknownType
+                | "hd" => if (if t1 = (SeqT t1: plcType) then true else false) then excecao t1 else raise UnknownType
+                | "tl" => if (if t1 = (SeqT t1: plcType) then true else false) then t1 else raise UnknownType
+                | "ise" => if (if t1 = (SeqT t1: plcType) then true else false) then BoolT else raise UnknownType
                 | _ => raise UnknownType
             end
         | (Prim2(operador, (e1:expr), (e2:expr))) =>
@@ -113,7 +110,7 @@ fun teval (e:expr) (p:plcType env): plcType =
                 val t2 = teval e2 p
             in case operador of
                  "&&" => if t1 = BoolT andalso t2 = BoolT then BoolT else raise UnknownType
-                | "::" => if ehSequencia t2 andalso t1 = excecao t2 then t2 else raise UnknownType
+                | "::" => if (if t2 = (SeqT t2: plcType) then true else false) andalso t1 = excecao t2 then t2 else raise UnknownType
                 | "+" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
                 | "-" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
                 | "*" => if t1 = IntT andalso t2 = IntT then IntT else raise UnknownType
