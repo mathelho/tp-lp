@@ -11,7 +11,7 @@ use "PlcChecker.sml";
 use "PlcInterp.sml";
 use "Environ.sml";
 (*Determinar se usaremos acentos ou não '.'
-Não, usaremos, da erro nos caracteres. Testei aqui*)
+Não usaremos, da erro nos caracteres. Testei aqui*)
 
 (*Ele fala sobre como lidar com as Exceções na aula: 2020-10-05 DCC024 LP - Tratamento de Erros 6*)
 
@@ -21,7 +21,6 @@ fun run e =
         val valueEvaluation = val2string(eval e [])
     in
         valueEvaluation ^ " : "^ typeEvaluation (*Especificando a saída conforme informado no fórum.*)
-        (* Vamos fazer com string pro enquanto. Dps temos que arrumar uma conversão para string*)
     end
     handle
         EmptySeq => "EXCECAO: E uma sequencia vazia"
