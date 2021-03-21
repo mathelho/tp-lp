@@ -19,7 +19,7 @@ exception NotFunc
 exception ListOutOfRange
 exception OpNonList
 
-(*Funcoes axiliazres para determinar o Prim1 e Prim2*)
+(*Funcoes auxiliares para determinar o Prim1 e Prim2*)
 fun ehSequencia (SeqT t: plcType) = true
     |   ehSequencia _ = false;
 
@@ -34,7 +34,10 @@ fun supIgualdade IntT = true    (* verifica se o plcType suporta operações de 
 (*Funcao Principal: tval*)
 fun teval (e:expr) (p:plcType env): plcType =
     case e of
-        (Var x) => lookup p x (*lookup vem do Envirom.sml*)
+        (Var x) => 
+            let in
+                (lookup p x) handle SymbolNotFound => raise SymbolNotFound (*lookup vem do Envirom.sml*)
+            end
         | (ConI _) =>  IntT
         | (ConB _) =>  BoolT (*Bool está definido para TRUE e FALSE*)
         | (List []) => ListT [] (*O ListT tem que ser uma lista vazia também*)
